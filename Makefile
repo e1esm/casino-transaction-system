@@ -16,4 +16,5 @@ up:
 	cd ./deployment && docker compose -p casino-transaction-system -f docker-compose-infra.yml -f docker-compose-services.yml up -d
 
 docs:
-	cd ./services/api-gateway && swag init -g ./src/cmd/main.go -o ./docs
+	docker run --rm -v $(PWD):/workspace -w /workspace ghcr.io/swaggo/swag:latest \
+		init -g ./services/api-gateway/src/cmd/main.go -o ./services/api-gateway/docs
