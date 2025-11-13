@@ -1,0 +1,48 @@
+syntax = "proto3";
+package tx_manager;
+
+option go_package = "src/proto/tx-manager";
+
+service TransactionManager{
+  rpc GetTransactionByID(GetTransactionByIDRequest) returns (GetTransactionByIDResponse);
+  rpc GetTransactionByFilters(GetTransactionByFiltersRequest) returns (GetTransactionByFiltersResponse);
+}
+
+message GetTransactionByFiltersResponse {
+  repeated Transaction transaction = 1;
+  int64 total = 2;
+}
+
+message Filters {
+  string user_id = 1;
+  TransactionType type = 2;
+}
+
+message GetTransactionByFiltersRequest {
+  Filters filters = 1;
+  string orderBy = 2;
+  int64 limit = 3;
+  int64 offset = 4;
+}
+
+message GetTransactionByIDRequest{
+  string id = 1;
+}
+
+message Transaction{
+  string id = 1;
+  string user_id = 2;
+  TransactionType type = 3;
+  int64 amount = 4;
+  int64 timestamp = 5;
+}
+
+message GetTransactionByIDResponse{
+  Transaction transaction = 1;
+}
+
+enum TransactionType{
+  All = 0;
+  Bet = 1;
+  Win = 2;
+}

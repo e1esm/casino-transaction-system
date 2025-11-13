@@ -1,0 +1,45 @@
+services:
+  tx-manager:
+    build:
+      context: ../services/tx-manager
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: tx-manager
+    environment:
+      GRPC_PORT: 50051
+      DATABASE_HOST: transactions_db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: tx_manager
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: tx_manager
+      DATABASE_SSL_MODE: disable
+      BROKER_HOST: kafka
+      BROKER_PORT: 9092
+      BROKER_TOPIC: transactions
+      BROKER_CONSUMER_GROUP: tx-manager
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - casino
+  api-gateway:
+    build:
+      context: ../services/api-gateway
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+    environment:
+      HTTP_PORT: 8080
+      TX_MANAGER_HOST: 'tx-manager:50051'
+    depends_on:
+      - tx-manager
+    networks:
+      - casino
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

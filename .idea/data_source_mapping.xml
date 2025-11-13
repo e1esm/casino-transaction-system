@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/4bea0615-2051-47f5-90fc-7f8486dc07a3/console.sql" value="4bea0615-2051-47f5-90fc-7f8486dc07a3" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/4bea0615-2051-47f5-90fc-7f8486dc07a3/console_1.sql" value="4bea0615-2051-47f5-90fc-7f8486dc07a3" />
+    <file url="file://$PROJECT_DIR$/migrations/tx_manager/00001_add_transactions_table.sql" value="4bea0615-2051-47f5-90fc-7f8486dc07a3" />
+    <file url="file://$PROJECT_DIR$/services/tx-manager/src/internal/repository/transaction/transaction.go" value="4bea0615-2051-47f5-90fc-7f8486dc07a3" />
+  </component>
+</project>

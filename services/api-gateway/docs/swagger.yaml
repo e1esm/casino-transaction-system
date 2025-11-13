@@ -1,0 +1,107 @@
+basePath: /api/v1
+definitions:
+  handlers.transaction:
+    properties:
+      amount:
+        type: integer
+      date:
+        type: string
+      id:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  handlers.transactions:
+    properties:
+      total:
+        type: integer
+      transactions:
+        items:
+          $ref: '#/definitions/handlers.transaction'
+        type: array
+    type: object
+info:
+  contact:
+    email: e.mikhaylov.dev@gmail.com
+    name: Egor Mikhaylov
+  title: Transaction Manager API
+  version: "1.0"
+paths:
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Returns transactions with optional filtering, pagination, and ordering
+      parameters:
+      - default: 10
+        description: Number of transactions to return
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      - description: Field to order by, e.g., amount desc
+        in: query
+        name: orderBy
+        type: string
+      - description: JSON-encoded filters, e.g., {\
+        in: query
+        name: filters
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transactions list and total count
+          schema:
+            $ref: '#/definitions/handlers.transactions'
+        "400":
+          description: Invalid request parameters
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get a list of transactions
+      tags:
+      - transactions
+  /transactions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a transaction by its UUID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction object
+          schema:
+            $ref: '#/definitions/handlers.transaction'
+        "400":
+          description: Invalid or missing ID
+          schema:
+            type: string
+        "404":
+          description: Transaction not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get a single transaction by ID
+      tags:
+      - transactions
+swagger: "2.0"
