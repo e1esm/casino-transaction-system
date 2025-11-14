@@ -1,16 +1,21 @@
-PROTO_SRC=./proto/tx-manager
-PROJECT_NAME=tx-manager
-SERVER_OUT=services/tx-manager/src/internal
-CLIENT_OUT=services/api-gateway/src/internal
+PROTO_DIR := ./proto/tx-manager
+PROTO_FILES := $(PROTO_DIR)/tx-manager.proto
+
+PROJECT_NAME := tx-manager
+
+SERVER_OUT := services/tx-manager/src/internal
+CLIENT_OUT := services/api-gateway/src/internal
+
+PROTOC_CMD = \
+	protoc --proto_path=$(PROTO_DIR) $(PROTO_FILES) \
+		--go_out=$(1) --go_opt=paths=source_relative \
+		--go-grpc_out=$(1) --go-grpc_opt=paths=source_relative
 
 protoc:
-	protoc $(PROTO_SRC)/$(PROJECT_NAME).proto \
-		--go_out=$(SERVER_OUT) --go_opt=paths=source_relative \
-		--go-grpc_out=$(SERVER_OUT) --go-grpc_opt=paths=source_relative
-
-	protoc $(PROTO_SRC)/$(PROJECT_NAME).proto \
-		--go_out=$(CLIENT_OUT) --go_opt=paths=source_relative \
-		--go-grpc_out=$(CLIENT_OUT) --go-grpc_opt=paths=source_relative
+	@mkdir -p $(SERVER_OUT) $(CLIENT_OUT)
+	$(call PROTOC_CMD,$(SERVER_OUT))
+	$(call PROTOC_CMD,$(CLIENT_OUT))
+	@echo "Proto generated for server and client."
 
 up:
 	cd ./deployment && docker compose -p casino-transaction-system -f docker-compose-infra.yml -f docker-compose-services.yml up -d
