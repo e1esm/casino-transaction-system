@@ -2,11 +2,22 @@ package config
 
 import "github.com/caarlos0/env/v11"
 
+type ConsumerConfig struct {
+	Topic             string `env:"TOPIC,required"`
+	ConsumerGroup     string `env:"GROUP,required"`
+	MaxFetchedRecords int    `env:"MAX_RECORDS_FETCHED,required"`
+	MaxRetries        int    `env:"MAX_RETRIES,required"`
+}
+
+type ProducerConfig struct {
+	Topic string `env:"TOPIC,required"`
+}
+
 type KafkaConfig struct {
-	Host          string `env:"HOST,required"`
-	Port          int    `env:"PORT" envDefault:"9092"`
-	Topic         string `env:"TOPIC,required"`
-	ConsumerGroup string `env:"CONSUMER_GROUP,required"`
+	Host           string         `env:"HOST,required"`
+	Port           int            `env:"PORT" envDefault:"9092"`
+	ConsumerConfig ConsumerConfig `envPrefix:"CONSUMER_"`
+	ProducerConfig ProducerConfig `envPrefix:"PRODUCER_"`
 }
 
 type DatabaseConfig struct {

@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Transaction, error)
 	GetAll(ctx context.Context, filters models.TransactionFilter, orderBy string, limit, offset int64) ([]models.Transaction, error)
+	Add(ctx context.Context, transactions ...models.Transaction) error
 }
 
 type Service struct {
@@ -42,4 +43,11 @@ func (s *Service) GetAll(ctx context.Context, filters models.TransactionFilter, 
 	}
 
 	return resp, int64(len(resp)), nil
+}
+
+func (s *Service) Create(ctx context.Context, transactions ...models.Transaction) error {
+	if len(transactions) == 0 {
+		return nil
+	}
+	return s.repo.Add(ctx, transactions...)
 }

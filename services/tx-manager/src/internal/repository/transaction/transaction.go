@@ -44,13 +44,22 @@ func New(cfg config.DatabaseConfig) (*Repository, error) {
 	return &Repository{db: pool}, nil
 }
 
-func (r *Repository) Add(ctx context.Context, t models.Transaction) error {
+func (r *Repository) Add(ctx context.Context, transactions ...models.Transaction) error {
 	query := `
-        INSERT INTO transactions (user_id, transaction_type, amount, transaction_time)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO transactions (user_id, transaction_type, amount, transaction_time, t_hash)
+        VALUES ($1, $2, $3, $4, $5) ON CONFLICT (t_hash) DO NOTHING;
     `
 
-	_, err := r.db.Exec(ctx, query, t.UserID, t.Type, t.Amount, t.TransactionTime)
+	batch := &pgx.Batch{}
+	for _, t := range transactions {
+		batch.Queue(query, t.UserID, t.Type, t.Amount, t.TransactionTime, t.Hash())
+	}
+
+	batchResults := r.db.SendBatch(ctx, batch)
+	defer batchResults.Close()
+
+	_, err := batchResults.Exec()
+
 	return err
 }
 

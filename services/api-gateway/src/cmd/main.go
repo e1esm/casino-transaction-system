@@ -70,7 +70,7 @@ func createHttpHandler(managerClient *client.TxManagerClient) http.Handler {
 func createTxManagerClient(clientConfig config.TxManagerClientConfig) *client.TxManagerClient {
 	cli, err := client.New(clientConfig)
 	if err != nil {
-		log.Fatalf("error creating transaction manager client: %v", err)
+		log.Fatalf("error creating transaction manager kafka: %v", err)
 	}
 
 	return cli

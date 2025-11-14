@@ -23,7 +23,7 @@ const (
 	TransactionManager_GetTransactionByFilters_FullMethodName = "/tx_manager.TransactionManager/GetTransactionByFilters"
 )
 
-// TransactionManagerClient is the client API for TransactionManager service.
+// TransactionManagerClient is the kafka API for TransactionManager service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransactionManagerClient interface {
