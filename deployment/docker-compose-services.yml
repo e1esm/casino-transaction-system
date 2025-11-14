@@ -15,8 +15,11 @@ services:
       DATABASE_SSL_MODE: disable
       BROKER_HOST: kafka
       BROKER_PORT: 9092
-      BROKER_TOPIC: transactions
-      BROKER_CONSUMER_GROUP: tx-manager
+      BROKER_CONSUMER_TOPIC: casino_transactions
+      BROKER_CONSUMER_GROUP: transactions_manager
+      BROKER_CONSUMER_MAX_RECORDS_FETCHED: 1000
+      BROKER_CONSUMER_MAX_RETRIES: 10
+      BROKER_PRODUCER_TOPIC: casino_dlq
     depends_on:
       - postgres
       - kafka

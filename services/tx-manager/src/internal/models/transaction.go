@@ -1,7 +1,10 @@
 package models
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,6 +24,12 @@ type Transaction struct {
 	Type            TransactionType
 	Amount          int
 	TransactionTime time.Time
+}
+
+func (t *Transaction) Hash() string {
+	data := t.UserID.String() + string(t.Type) + strconv.Itoa(t.Amount) + t.TransactionTime.UTC().String()
+	hash := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(hash[:])
 }
 
 type TransactionFilter struct {
