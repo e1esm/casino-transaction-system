@@ -1,10 +1,10 @@
-PROTO_DIR := ./proto/tx-manager
-PROTO_FILES := $(PROTO_DIR)/tx-manager.proto
-
 PROJECT_NAME := tx-manager
 
-SERVER_OUT := services/tx-manager/src/internal
-CLIENT_OUT := services/api-gateway/src/internal
+PROTO_DIR := ./proto/$(PROJECT_NAME)
+PROTO_FILES := $(PROTO_DIR)/$(PROJECT_NAME).proto
+
+SERVER_OUT := services/tx-manager/src/internal/proto/$(PROJECT_NAME)
+CLIENT_OUT := services/api-gateway/src/internal/proto/$(PROJECT_NAME)
 
 PROTOC_CMD = \
 	protoc --proto_path=$(PROTO_DIR) $(PROTO_FILES) \

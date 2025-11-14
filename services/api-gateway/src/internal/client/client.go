@@ -25,7 +25,7 @@ func New(config config.TxManagerClientConfig) (*TxManagerClient, error) {
 		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
 			retry.WithMax(10),
 			retry.WithCodes(codes.Unavailable),
-			retry.WithPerRetryTimeout(time.Second),
+			retry.WithPerRetryTimeout(time.Second*5),
 			retry.WithBackoff(retry.BackoffLinear(500*time.Millisecond)),
 		)),
 	)
