@@ -38,7 +38,7 @@ func (h *Handler) GetTransactionByID(ctx context.Context, req *proto.GetTransact
 	if err != nil {
 		prErr, isInternal := hErr.ParseSvcErrToProto(err)
 		if isInternal {
-			log.Println(prErr.Error())
+			log.Println(err.Error())
 		}
 		return nil, prErr
 	}
@@ -62,7 +62,7 @@ func (h *Handler) GetTransactionByFilters(ctx context.Context, req *proto.GetTra
 	if err != nil {
 		prErr, isInternal := hErr.ParseSvcErrToProto(err)
 		if isInternal {
-			log.Println(prErr.Error())
+			log.Println(err.Error())
 		}
 
 		return nil, prErr

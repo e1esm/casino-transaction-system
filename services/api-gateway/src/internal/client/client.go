@@ -2,11 +2,15 @@ package client
 
 import (
 	"context"
+	"time"
 
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/config"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/entities"
 	txProto "github.com/e1esm/casino-transaction-system/api-gateway/src/internal/proto/tx-manager"
+	"google.golang.org/grpc/codes"
+
 	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -16,7 +20,15 @@ type TxManagerClient struct {
 }
 
 func New(config config.TxManagerClientConfig) (*TxManagerClient, error) {
-	cli, err := grpc.NewClient(config.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cli, err := grpc.NewClient(config.Host,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
+			retry.WithMax(10),
+			retry.WithCodes(codes.Unavailable),
+			retry.WithPerRetryTimeout(time.Second*5),
+			retry.WithBackoff(retry.BackoffLinear(500*time.Millisecond)),
+		)),
+	)
 	if err != nil {
 		return nil, err
 	}
