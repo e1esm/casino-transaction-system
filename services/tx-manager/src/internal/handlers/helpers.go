@@ -51,7 +51,7 @@ func convertProtoFiltersToModel(req *proto.Filters) (models.TransactionFilter, e
 	if len(req.UserId) > 0 {
 		parsedID, err := uuid.Parse(req.UserId)
 		if err != nil {
-			return models.TransactionFilter{}, fmt.Errorf("faield to parse user id: %w", err)
+			return models.TransactionFilter{}, fmt.Errorf("failed to parse user id: %w", err)
 		}
 
 		id = &parsedID

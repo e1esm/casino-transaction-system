@@ -6,6 +6,8 @@ PROTO_FILES := $(PROTO_DIR)/$(PROJECT_NAME).proto
 SERVER_OUT := services/tx-manager/src/internal/proto/$(PROJECT_NAME)
 CLIENT_OUT := services/api-gateway/src/internal/proto/$(PROJECT_NAME)
 
+SERVICES = services/api-gateway services/tx-manager
+
 PROTOC_CMD = \
 	protoc --proto_path=$(PROTO_DIR) $(PROTO_FILES) \
 		--go_out=$(1) --go_opt=paths=source_relative \
@@ -25,7 +27,17 @@ docs:
 		init -g ./services/api-gateway/src/cmd/main.go -o ./services/api-gateway/docs
 
 mockery:
-	docker run \
-	    -v $(PWD)/services/api-gateway:/api-gateway \
-	    -w /api-gateway \
-	    vektra/mockery:3
+	@for dir in $(SERVICES); do \
+		name=$$(basename $$dir); \
+		echo "Generating mocks for $$dir"; \
+		docker run \
+			-v $(PWD)/$$dir:/$$name \
+			-w /$$name \
+			vektra/mockery:3; \
+	done
+
+test:
+	@for svc in $(SERVICES); do \
+		echo "Running tests for $$svc"; \
+		(cd $$svc && go test -coverprofile=coverage.out ./...); \
+	done

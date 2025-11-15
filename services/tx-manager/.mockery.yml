@@ -1,0 +1,26 @@
+all: false
+dir: '{{.InterfaceDir}}/mocks'
+filename: '{{.InterfaceName}}_mock.go'
+force-file-write: true
+formatter: goimports
+generate: true
+include-auto-generated: false
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: 'mocks'
+recursive: true
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  github.com/e1esm/casino-transaction-system/tx-manager/src/internal/service/transaction:
+    interfaces:
+      Repository:
+  github.com/e1esm/casino-transaction-system/tx-manager/src/internal/handlers:
+    interfaces:
+      TransactionService:
+  github.com/e1esm/casino-transaction-system/tx-manager/src/internal/broker/kafka/consumer:
+    interfaces:
+      Validator:
+      SaverService:
+      DLQProducer:
