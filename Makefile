@@ -23,3 +23,9 @@ up:
 docs:
 	docker run --rm -v $(PWD):/workspace -w /workspace ghcr.io/swaggo/swag:latest \
 		init -g ./services/api-gateway/src/cmd/main.go -o ./services/api-gateway/docs
+
+mockery:
+	docker run \
+	    -v $(PWD)/services/api-gateway:/api-gateway \
+	    -w /api-gateway \
+	    vektra/mockery:3

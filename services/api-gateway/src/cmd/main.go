@@ -8,13 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/e1esm/casino-transaction-system/api-gateway/docs"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/client"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/config"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/handlers"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/handlers/middleware"
 	"github.com/swaggo/http-swagger/v2"
-
-	_ "github.com/e1esm/casino-transaction-system/api-gateway/docs"
 )
 
 // @title Transaction Manager API
@@ -68,7 +67,7 @@ func createHttpHandler(managerClient *client.TxManagerClient) http.Handler {
 }
 
 func createTxManagerClient(clientConfig config.TxManagerClientConfig) *client.TxManagerClient {
-	cli, err := client.New(clientConfig)
+	cli, err := client.NewClientFromConfig(clientConfig)
 	if err != nil {
 		log.Fatalf("error creating transaction manager kafka: %v", err)
 	}

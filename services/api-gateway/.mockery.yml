@@ -1,0 +1,23 @@
+all: false
+dir: '{{.InterfaceDir}}/mocks'
+filename: '{{.InterfaceName}}_mock.go'
+force-file-write: true
+formatter: goimports
+generate: true
+include-auto-generated: false
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: 'mocks'
+recursive: true
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  github.com/e1esm/casino-transaction-system/api-gateway/src/internal/client:
+    interfaces:
+      ProtoClient:
+  github.com/e1esm/casino-transaction-system/api-gateway/src/internal/handlers:
+    interfaces:
+      Client:
+
+
