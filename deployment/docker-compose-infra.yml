@@ -67,7 +67,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -77,7 +77,9 @@ services:
     image: ghcr.io/kukymbr/goose-docker:3.26.0
     restart: no
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+
     environment:
       - GOOSE_DRIVER=postgres
       - GOOSE_DBSTRING=host=transactions_db port=5432 user=tx_manager password=password dbname=tx_manager
