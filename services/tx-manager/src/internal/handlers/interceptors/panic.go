@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func RecoveryUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
+func RecoveryUnaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = status.Error(codes.Internal, fmt.Sprintf("Panic: `%s` %s", info.FullMethod, string(debug.Stack())))

@@ -7,6 +7,10 @@ import (
 )
 
 func ParseSvcErrToResp(err error) (int, string) {
+	if err == nil {
+		return http.StatusOK, ""
+	}
+
 	if svcerr.IsNotFound(err) {
 		return http.StatusNotFound, err.Error()
 	}

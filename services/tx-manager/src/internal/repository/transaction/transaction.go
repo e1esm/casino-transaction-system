@@ -26,6 +26,12 @@ type Repository struct {
 	db *pgxpool.Pool
 }
 
+func NewWithPool(db *pgxpool.Pool) *Repository {
+	return &Repository{
+		db: db,
+	}
+}
+
 func New(cfg config.DatabaseConfig) (*Repository, error) {
 	pool, err := pgxpool.New(context.Background(),
 		fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
@@ -41,13 +47,13 @@ func New(cfg config.DatabaseConfig) (*Repository, error) {
 		return nil, err
 	}
 
-	return &Repository{db: pool}, nil
+	return NewWithPool(pool), nil
 }
 
 func (r *Repository) Add(ctx context.Context, transactions ...models.Transaction) error {
 	query := `
         INSERT INTO transactions (user_id, transaction_type, amount, transaction_time, t_hash)
-        VALUES ($1, $2, $3, $4, $5) ON CONFLICT (t_hash) DO NOTHING;
+        VALUES ($1, $2, $3, $4, $5) ON CONFLICT (t_hash) DO NOTHING
     `
 
 	batch := &pgx.Batch{}

@@ -7,19 +7,28 @@ import (
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/config"
 	"github.com/e1esm/casino-transaction-system/api-gateway/src/internal/entities"
 	txProto "github.com/e1esm/casino-transaction-system/api-gateway/src/internal/proto/tx-manager"
-	"google.golang.org/grpc/codes"
 
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type TxManagerClient struct {
-	cli txProto.TransactionManagerClient
+type ProtoClient interface {
+	GetTransactionByID(ctx context.Context, in *txProto.GetTransactionByIDRequest, opts ...grpc.CallOption) (*txProto.GetTransactionByIDResponse, error)
+	GetTransactionByFilters(ctx context.Context, in *txProto.GetTransactionByFiltersRequest, opts ...grpc.CallOption) (*txProto.GetTransactionByFiltersResponse, error)
 }
 
-func New(config config.TxManagerClientConfig) (*TxManagerClient, error) {
+type TxManagerClient struct {
+	cli ProtoClient
+}
+
+func NewClientFromProto(cli txProto.TransactionManagerClient) *TxManagerClient {
+	return &TxManagerClient{cli: cli}
+}
+
+func NewClientFromConfig(config config.TxManagerClientConfig) (*TxManagerClient, error) {
 	cli, err := grpc.NewClient(config.Host,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(
@@ -33,15 +42,14 @@ func New(config config.TxManagerClientConfig) (*TxManagerClient, error) {
 		return nil, err
 	}
 
-	return &TxManagerClient{
-		txProto.NewTransactionManagerClient(cli),
-	}, nil
+	return NewClientFromProto(txProto.NewTransactionManagerClient(cli)), nil
 }
 
 func (c *TxManagerClient) GetTransactionByID(ctx context.Context, id uuid.UUID) (entities.Transaction, error) {
 	resp, err := c.cli.GetTransactionByID(ctx, &txProto.GetTransactionByIDRequest{
 		Id: id.String(),
 	})
+
 	if err != nil {
 		return entities.Transaction{}, mapReturnedCodeToSvcError(err)
 	}

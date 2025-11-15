@@ -3,7 +3,6 @@ package consumer
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -12,6 +11,7 @@ import (
 	"github.com/e1esm/casino-transaction-system/tx-manager/src/internal/broker/types"
 	"github.com/e1esm/casino-transaction-system/tx-manager/src/internal/config"
 	"github.com/e1esm/casino-transaction-system/tx-manager/src/internal/models"
+	"github.com/e1esm/casino-transaction-system/tx-manager/src/internal/svcerr"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 )
@@ -38,9 +38,20 @@ type Client struct {
 	maxRetrySaveAttempts int
 }
 
-func New(cfg config.KafkaConfig, txSaver SaverService, validator Validator, producer DLQProducer) (*Client, error) {
-	if cfg.ConsumerConfig.MaxRetries == 0 {
-		return nil, errors.New("max retries is zero")
+func NewWithClient(cli *kgo.Client, txSaver SaverService, validator Validator, producer DLQProducer, maxPolled, maxRetries int) *Client {
+	return &Client{
+		client:               cli,
+		validator:            validator,
+		txSaver:              txSaver,
+		dlqProducer:          producer,
+		maxRecordsPoll:       maxPolled,
+		maxRetrySaveAttempts: maxRetries,
+	}
+}
+
+func NewWithConfig(cfg config.KafkaConfig, txSaver SaverService, validator Validator, producer DLQProducer) (*Client, error) {
+	if err := validate(cfg); err != nil {
+		return nil, err
 	}
 
 	cli, err := kgo.NewClient(
@@ -54,14 +65,14 @@ func New(cfg config.KafkaConfig, txSaver SaverService, validator Validator, prod
 		return nil, err
 	}
 
-	return &Client{
-		client:               cli,
-		validator:            validator,
-		txSaver:              txSaver,
-		dlqProducer:          producer,
-		maxRetrySaveAttempts: cfg.ConsumerConfig.MaxRetries,
-		maxRecordsPoll:       cfg.ConsumerConfig.MaxFetchedRecords,
-	}, nil
+	return NewWithClient(
+		cli,
+		txSaver,
+		validator,
+		producer,
+		cfg.ConsumerConfig.MaxFetchedRecords,
+		cfg.ConsumerConfig.MaxRetries,
+	), nil
 }
 
 func (c *Client) Consume(ctx context.Context) error {
@@ -80,7 +91,6 @@ func (c *Client) Consume(ctx context.Context) error {
 			if len(failedEntries) > 0 {
 				c.dlqProducer.Produce(ctx, failedEntries)
 			}
-
 		}
 	}
 }
@@ -157,4 +167,24 @@ func convertTransactionToModel(tx types.Transaction) models.Transaction {
 		Amount:          tx.Amount,
 		TransactionTime: tx.TransactionDate,
 	}
+}
+
+func validate(cfg config.KafkaConfig) error {
+	if cfg.ConsumerConfig.MaxRetries == 0 {
+		return fmt.Errorf("%w: max retries is zero", svcerr.ErrBadField)
+	}
+
+	if cfg.ConsumerConfig.MaxFetchedRecords == 0 {
+		return fmt.Errorf("%w: max records is zero", svcerr.ErrBadField)
+	}
+
+	if len(cfg.Host) == 0 || (cfg.Port < 0 || cfg.Port > 65535) {
+		return fmt.Errorf("%w: invalid host or port", svcerr.ErrBadField)
+	}
+
+	if len(cfg.ConsumerConfig.Topic) == 0 {
+		return fmt.Errorf("%w: empty topic", svcerr.ErrBadField)
+	}
+
+	return nil
 }
