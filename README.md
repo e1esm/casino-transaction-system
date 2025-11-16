@@ -48,7 +48,7 @@ The fields are:
 - transaction_time timestamp with timezone
 - t_hash text ( to guarantee that several exact events aren't written several times on a consumer behalf as no transaction id is initially provided from broker)
 
-Its schema is based on migrations that are located in **$(project)/migrations/tx_manager**
+Its schema is based on migrations that are located in **./migrations/tx_manager**
 
 ## Installation and Setup
 
