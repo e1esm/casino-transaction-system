@@ -15,7 +15,7 @@ and exposes a read-only REST API for external clients.
 - Programming language: Golang
 - Message Broker: Apache Kafka
 - Database: PostgreSQL
-- API: REST for external communication, Protobuf for internal communication
+- API: REST for external communication, gRPC for internal communication
 - Database migrations: Goose
 - Containerization: Docker Compose
 
