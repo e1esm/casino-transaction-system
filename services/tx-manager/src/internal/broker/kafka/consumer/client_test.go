@@ -64,12 +64,12 @@ func TestMain(m *testing.M) {
 
 	kafkaReq := testcontainers.ContainerRequest{
 		Image:        "confluentinc/cp-kafka:7.4.0",
-		ExposedPorts: []string{"9092/tcp"},
+		ExposedPorts: []string{"9094/tcp"},
 		Env: map[string]string{
 			"KAFKA_BROKER_ID":                        "1",
 			"KAFKA_ZOOKEEPER_CONNECT":                "zookeeper:2181",
-			"KAFKA_LISTENERS":                        "PLAINTEXT://0.0.0.0:9092",
-			"KAFKA_ADVERTISED_LISTENERS":             "PLAINTEXT://127.0.0.1:9092",
+			"KAFKA_LISTENERS":                        "PLAINTEXT://0.0.0.0:9094",
+			"KAFKA_ADVERTISED_LISTENERS":             "PLAINTEXT://127.0.0.1:9094",
 			"KAFKA_LISTENER_SECURITY_PROTOCOL_MAP":   "PLAINTEXT:PLAINTEXT",
 			"KAFKA_INTER_BROKER_LISTENER_NAME":       "PLAINTEXT",
 			"KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR": "1",
@@ -80,8 +80,8 @@ func TestMain(m *testing.M) {
 		WaitingFor: wait.ForLog("started (kafka.server.KafkaServer)").WithStartupTimeout(120 * time.Second),
 		HostConfigModifier: func(config *container.HostConfig) {
 			config.PortBindings = nat.PortMap{
-				"9092/tcp": []nat.PortBinding{
-					{HostIP: "0.0.0.0", HostPort: "9092"},
+				"9094/tcp": []nat.PortBinding{
+					{HostIP: "0.0.0.0", HostPort: "9094"},
 				},
 			}
 		},
@@ -97,7 +97,7 @@ func TestMain(m *testing.M) {
 	defer kafkaC.Terminate(ctx)
 
 	kafkaHost, _ = kafkaC.Host(ctx)
-	nPort, _ := kafkaC.MappedPort(ctx, "9092")
+	nPort, _ := kafkaC.MappedPort(ctx, "9094")
 	kafkaPort = nPort.Port()
 
 	kafkaC.Exec(ctx, []string{
