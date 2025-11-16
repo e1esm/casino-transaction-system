@@ -11,7 +11,7 @@ and exposes a read-only REST API for external clients.
 - Tx Manager - Listens to incoming events from Kafka and exposes gRPC API for api gateway
 - API Gateway - Exposes read-only REST API for external clients
 
-## Technical stack
+## Tech stack
 - Programming language: Golang
 - Message Broker: Apache Kafka
 - Database: PostgreSQL
@@ -26,6 +26,9 @@ When running locally, host is localhost and port is the port exposed by the API 
 
 ## Kafka Integration
 Tx Manager consumes events from topic: **casino_transactions**.
+
+Partition key is **user_id** for keeping events of the same user in order in case we have multiple consumers.
+
 The events should be sent in this schema:
 ```json
 {
